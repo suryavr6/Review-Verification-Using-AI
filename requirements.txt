@@ -1,0 +1,9 @@
+# ReviewGuard AI - runtime dependencies (versions match your original pip freeze)
+streamlit==1.57.0
+pandas==3.0.3
+numpy==2.4.4
+matplotlib==3.10.9
+scikit-learn==1.8.0
+textblob==0.20.0
+beautifulsoup4==4.15.0
+curl_cffi==0.15.0

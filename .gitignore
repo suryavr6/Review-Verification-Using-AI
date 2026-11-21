@@ -1,0 +1,24 @@
+# Python virtual environments
+venv/
+.venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Environment and secrets
+.env
+.streamlit/secrets.toml
+
+# Local history and temporary files
+.history/
+history.csv
+
+# Empty or unused files
+model1
+predect.py
+
+# Editor and operating system files
+.vscode/
+.DS_Store
+Thumbs.db
