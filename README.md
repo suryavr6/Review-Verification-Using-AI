@@ -1,80 +1,187 @@
-# ReviewGuard AI — Review Verification Using AI
+# ReviewGuard AI – Review Verification Using AI
 
-A dark-and-gold, 12-page Streamlit workspace around your existing model
-(TF-IDF + Logistic Regression, labels `CG` = computer-generated / fake, `OR` = original / genuine).
-Your `model/*.pkl` files are untouched and nothing was retrained.
+An AI-powered review analysis system that classifies product reviews as **Computer-Generated (CG)** or **Original (OR)** using Natural Language Processing and Machine Learning.
 
-> Predictions are **text-based estimates** of resemblance to the CG/OR training classes.
-> They are not proof of authenticity and cannot verify a purchase or a buyer's identity.
+ReviewGuard AI helps users analyze review text, identify potentially suspicious patterns, examine sentiment, and generate analysis reports through an interactive Streamlit dashboard.
 
-## Run it (Windows PowerShell)
+---
 
-```powershell
-cd path\to\ReviewGuard_Project
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python -m streamlit run app.py
+## Project Overview
+
+Online product reviews influence purchasing decisions, but not every review is necessarily genuine. ReviewGuard AI explores how machine learning and natural language processing can help identify potentially computer-generated reviews.
+
+The application uses a trained Logistic Regression model with TF-IDF text vectorization to analyze review content and predict its classification.
+
+It also provides an interactive dashboard for individual reviews, batch analysis, URL-based extraction, sentiment analysis, historical results, and report generation.
+
+## Key Features
+
+- **AI-Powered Classification:** Classifies reviews as Computer-Generated (CG) or Original (OR).
+- **Single Review Analysis:** Analyze individual product reviews.
+- **Batch Analysis:** Upload review datasets and analyze multiple reviews.
+- **URL Analyzer:** Extract and analyze review content from supported product or sample pages.
+- **Sentiment Analysis:** Examine the sentiment and polarity of review text.
+- **Suspicious Pattern Detection:** Explore potentially unusual review patterns.
+- **Analytics Dashboard:** View analysis statistics and visual insights.
+- **Review History:** Access previously processed reviews within the application.
+- **Export Reports:** Export analysis results in CSV and JSON formats.
+- **Model Information:** View details about the underlying machine learning approach.
+
+## Technology Stack
+
+| Category | Technologies |
+|---|---|
+| Programming Language | Python |
+| Frontend / Dashboard | Streamlit |
+| Machine Learning | Scikit-learn |
+| ML Algorithm | Logistic Regression |
+| Text Processing | TF-IDF Vectorization |
+| Natural Language Processing | TextBlob |
+| Data Processing | Pandas, NumPy |
+| Web Scraping | BeautifulSoup4, curl_cffi |
+| Data Visualization | Matplotlib |
+| Model Storage | Pickle |
+
+## How It Works
+
+1. **Input:** The user enters a product review, uploads a dataset, or provides a supported URL.
+2. **Text Processing:** The review text is cleaned and prepared for analysis.
+3. **Feature Extraction:** TF-IDF converts the text into numerical features.
+4. **Machine Learning Prediction:** The trained Logistic Regression model analyzes the extracted features.
+5. **Classification:** The application predicts one of two classes:
+   - **CG:** Computer-Generated
+   - **OR:** Original
+6. **Results:** The dashboard displays the prediction and relevant analysis.
+
+## Project Structure
+
+```text
+ReviewGuard_Project/
+│
+├── app.py
+├── engine.py
+├── main.py
+├── train_model.py
+│
+├── model/
+│   ├── fake_review_model.pkl
+│   └── tfidf_vectorizer.pkl
+│
+├── styles/
+│   └── style.css
+│
+├── tests/
+│   ├── test_app_mock.py
+│   └── test_engine.py
+│
+├── legacy/
+│   └── app_original.py
+│
+├── .streamlit/
+│   └── config.toml
+│
+├── fake_reviews_dataset.csv
+├── requirements.txt
+├── README.md
+└── .gitignore
 ```
 
-Always start it from the project folder. If you already have your old virtual environment, just activate it;
-no new packages were added (versions in `requirements.txt` match your original `pip freeze`).
+## Installation and Setup
 
-## Pages
+### 1. Clone the Repository
 
-Overview · Single Review · Batch Analysis · URL Analyzer · Analytics · Sentiment Analysis ·
-Suspicious Patterns · History · Export Reports · Model Performance · About Model · Settings
+```bash
+git clone https://github.com/suryavr6/Review-Verification-Using-AI.git
+```
 
-## Project layout
+### 2. Navigate to the Project Directory
 
-| File | Purpose |
+```bash
+cd Review-Verification-Using-AI
+```
+
+### 3. Create a Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+### 4. Activate the Virtual Environment
+
+**Windows PowerShell:**
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+### 5. Install Dependencies
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### 6. Run the Application
+
+```bash
+streamlit run app.py
+```
+
+The application will open in your default browser. If it does not, open the local URL displayed in the terminal.
+
+## Machine Learning Approach
+
+ReviewGuard AI uses a supervised machine learning approach.
+
+**Algorithm:** Logistic Regression
+
+**Feature Extraction:** TF-IDF (Term Frequency–Inverse Document Frequency)
+
+**Classification Labels:**
+
+| Label | Meaning |
 |---|---|
-| `app.py` | The interface (12 pages, navigation, filters, downloads) |
-| `engine.py` | All logic: model loading, analysis, URL extraction, exports, charts |
-| `styles/style.css`, `.streamlit/config.toml` | Dark and gold theme |
-| `model/` | Your original `fake_review_model.pkl` and `tfidf_vectorizer.pkl` (unchanged) |
-| `fake_reviews_dataset.csv`, `train_model.py`, `main.py` | Your originals (unchanged) |
-| `legacy/app_original.py` | Your previous `app.py`, kept for reference |
-| `tests/` | `test_engine.py`, `test_app_mock.py` (see "Testing") |
+| CG | Computer-Generated |
+| OR | Original |
 
-## What changed and why (please read)
+The trained model and vectorizer are stored in the `model/` directory and loaded by the application for predictions.
 
-While inspecting your code I found problems. Each was fixed minimally and is listed here.
+## Testing
 
-1. **The model never influenced the verdict.** The old code tested `prediction == 1`, but the model returns the
-   strings `'CG'`/`'OR'`, so that was never true; only the keyword rules could mark a review FAKE.
-   The verdict rule is unchanged in form (FAKE if the model says CG **or** the heuristic score is 2 or more),
-   but it now actually uses the model. Expect more reviews to be flagged than before.
-2. **Fake/Genuine scores were hard-coded** (90/10 or 15/85). They are now the model's real class probabilities
-   (`Fake Probability` = CG, `Genuine Probability` = OR). *Confidence* is still the higher of the two.
-3. **A fabricated fallback was removed.** If the model files were missing, the old code silently returned
-   "prediction 0, confidence 75%". Now the app shows a clear error and refuses to analyse.
-4. **Batch CSV upload, session history and CSV/JSON export did not exist** in the old `app.py`, so they are new,
-   not preserved. History is session-only (in memory), as before; nothing is written to disk.
-5. URL extraction (DummyJSON, Myntra, Flipkart/Shopsy, generic) is the **original logic, unchanged**; only the
-   Streamlit calls were replaced with a returned message list so errors display cleanly.
-6. `clean_text`, the keyword list and all heuristic thresholds are unchanged. `styles/style.css` was previously
-   unused; it now drives the theme.
+The project includes automated tests for important application and processing components.
 
-**Model Performance page:** the 86.09% is shown as *reported*. Precision, recall, F1 and the confusion matrix
-are only shown after you press **Run hold-out evaluation**, which re-creates your 80/20 split
-(`random_state=42`) on `fake_reviews_dataset.csv` and scores the existing model. It reproduces 86.09%.
-(The vectoriser was fitted on the full dataset, as in your training script.)
+Run the tests using:
 
-## Testing — what was and was not verified
+```bash
+python -m pytest tests/
+```
 
-Run from the project folder: `python tests/test_engine.py` and `python tests/test_app_mock.py`.
+## Important Note
 
-Verified by execution: syntax (Python 3.11 and 3.13); model loading and label handling; single, batch and
-URL pipelines; probabilities; empty-data charts; identical, invalid and spread timestamps; CSV/JSON/TXT exports;
-session history, filters and the confirm-before-clear flow; all 12 pages run without errors in empty and
-populated states; hold-out metrics.
+ReviewGuard AI provides machine-learning-based predictions using review text. Its results are estimates, not definitive proof that a review is genuine, fake, or written by a particular person.
 
-**Not verified:** the pages were exercised with a recording stand-in for Streamlit, so the real Streamlit
-rendering, CSS appearance, and widget behaviour have **not** been seen in a browser. Live scraping of Myntra,
-Flipkart, Shopsy and generic sites was not tested (no internet access in the build environment, and those
-sites change and block bots). DummyJSON logic was tested against a simulated response. Sentiment tests used a
-simple stand-in for TextBlob. If something looks off on your machine, tell me what you see and I will fix it.
+The application does not independently verify a reviewer's identity, purchase history, or actual product experience. Prediction quality depends on the training data and the patterns learned by the model.
 
-Known limits: your model files were saved with scikit-learn 1.8.0; a different version prints a
-version warning. Batch runs are capped at 20,000 rows to keep the session responsive.
+URL extraction may also depend on the structure and accessibility of the target website.
+
+## Future Enhancements
+
+- Improve model performance with larger and more diverse datasets.
+- Explore advanced NLP and deep learning models.
+- Improve support for different product-review websites.
+- Develop a mobile-friendly version.
+- Explore multilingual review analysis.
+- Add more advanced review analytics and visualizations.
+
+## Author
+
+**Surya VR**
+
+B.Sc. Artificial Intelligence and Machine Learning  
+Dr. N.G.P. Arts and Science College
+
+- **GitHub:** [suryavr6](https://github.com/suryavr6)
+- **LinkedIn:** [Surya V.R.](https://www.linkedin.com/in/surya-v-r-27028841b/)
+
+---
+
+*Built as an Artificial Intelligence and Machine Learning project to explore practical applications of NLP, text classification, and machine learning in online review analysis.*
